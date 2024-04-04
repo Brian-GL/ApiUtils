@@ -9,13 +9,19 @@
     <Description>Set of functionalities, services, extensions and code optimizations useful in day-to-day API coding.</Description>
     <RepositoryType>git</RepositoryType>
     <Authors>BrianGL</Authors>
+    <PackageProjectUrl>https://github.com/Brian-GL/ApiUtils</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Brian-GL/ApiUtils</RepositoryUrl>
+    <PackageTags>api;utils;optimization</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
     <Folder Include="Attributes\" />
-    <Folder Include="Extensions\" />
     <Folder Include="Services\" />
     <Folder Include="Utilities\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ZString" Version="2.6.0" />
   </ItemGroup>
 
 </Project>

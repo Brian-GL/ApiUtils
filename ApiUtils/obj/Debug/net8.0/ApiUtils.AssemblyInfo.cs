@@ -16,10 +16,11 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyDescriptionAttribute("Set of functionalities, services, extensions and code optimizations useful in day" +
     "-to-day API coding.")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4c527b97443c9574f2536b8f181b828ae96385ac")]
 [assembly: System.Reflection.AssemblyProductAttribute("ApiUtils")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ApiUtils")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
+[assembly: System.Reflection.AssemblyMetadataAttribute("RepositoryUrl", "https://github.com/Brian-GL/ApiUtils")]
 
 // Generado por la clase WriteCodeFragment de MSBuild.
 
