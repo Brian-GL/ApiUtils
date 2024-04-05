@@ -1,4 +1,5 @@
 ﻿using ApiUtils.Extensions;
+using Cysharp.Text;
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
@@ -10,9 +11,20 @@ namespace ApiUtils.Exceptions
     /// </summary>
     /// <param name="paramName">Param name witch generates exception</param>
     [Serializable]
-    public class ArgumentEmptyException(string? paramName) : ArgumentException(message: "Empty value", paramName: paramName)
+    public class ArgumentEmptyException(string? paramName) : SystemException(message: "Empty value")
     {
-        /// <summary>Throws an <see cref="ArgumentNullException"/> if <paramref name="argument"/> is null.</summary>
+        public virtual string? ParamName => paramName;
+
+        public override string Message
+        {
+            get
+            {
+                string? s = base.Message;
+                return !s.IsNullEmptyOrBlank() ? ZString.Concat(s, Environment.NewLine, "Param name: ", paramName.Available(replacement: "Unknown")) : s;
+            }
+        }
+
+        /// <summary>Throws an <see cref="ArgumentEmptyException"/> if <paramref name="argument"/> is empty.</summary>
         /// <param name="argument">The reference type argument to validate as non-null.</param>
         /// <param name="paramName">The name of the parameter with which <paramref name="argument"/> corresponds.</param>
         public static void ThrowIfEmpty(object? argument, [CallerArgumentExpression(nameof(argument))] string? paramName = null)

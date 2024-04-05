@@ -1,4 +1,5 @@
-﻿using Cysharp.Text;
+﻿using ApiUtils.Exceptions;
+using Cysharp.Text;
 using System.Globalization;
 using System.Reflection;
 using System.Security.Cryptography;
@@ -10,7 +11,7 @@ namespace ApiUtils.Extensions
     /// <summary>
     /// Primitive data type extensions class
     /// </summary>
-    public static class PrimitiveExtensions
+    public static partial class PrimitiveExtensions
     {
         #region Byte Array
 
@@ -129,6 +130,50 @@ namespace ApiUtils.Extensions
                 return true;
 
             return value!.Length < 1;
+        }
+
+        /// <summary>
+        /// Defines a SQL <a href="https://www.w3schools.com/sql/sql_like.asp">like</a> function to search for a specified <paramref name="pattern"/> in <paramref name="value"/>
+        /// </summary>
+        /// <param name="value">Value to find <paramref name="pattern"/> coincidence inside it</param>
+        /// <param name="pattern">Coincidence to find. To find you can use the character '*' to specify any caracter previous or next from the coincidence to find</param>
+        /// <returns><see cref="true"/> if <paramref name="pattern"/> coincidence is found in <paramref name="value"/>. <see cref="false"/> otherwise</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="pattern"/> is null</exception>
+        /// <exception cref="ArgumentFormatException">If <paramref name="pattern"/> has an invalid format value</exception>
+        /// <exception cref="ArgumentException">If <paramref name="pattern"/> could not be used for like operation</exception>
+        /// <exception cref="RegexMatchTimeoutException">If <paramref name="pattern"/> could not be used for match operation</exception>
+        public static bool Like(this string? value, string pattern)
+        {
+            ArgumentNullException.ThrowIfNull(argument: pattern, paramName: nameof(pattern));
+            ArgumentFormatException.ThrowIfInvalid(argument: pattern, regularExpression: LikeRegex());
+
+            if (value.IsNullOrEmpty())
+                return false;
+
+            // Generate the new regex expression to make like function.
+
+            GroupCollection groupCollection = LikeGroupRegex().Match(input: pattern).Groups;
+            IEnumerable<string> keys = groupCollection.Keys;
+            using Utf8ValueStringBuilder stringBuilder = new();
+
+            foreach(string key in keys)
+            {
+                switch (key)
+                {
+                    case "first":
+                    case "second":
+                        stringBuilder.Append(value: ".+");
+                        break;
+                    case "coincidence":
+                        stringBuilder.Append(value: groupCollection["coincidence"]);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            Regex regularExpression = new(pattern: stringBuilder.ToString(), options: RegexOptions.Compiled);
+            return regularExpression.IsMatch(input: value!);
         }
 
         /// <summary>
@@ -342,6 +387,19 @@ namespace ApiUtils.Extensions
             return normalize;
 
         }
+
+
+
+        #endregion
+
+        #region Generated Regex
+
+        [GeneratedRegex(pattern: @"^((?<first>[*]{0,1}))?((?<coincidence>.+))?((?<second>[*]{0,1}))?$", options: RegexOptions.Compiled)]
+        private static partial Regex LikeGroupRegex();
+
+
+        [GeneratedRegex(pattern: @"^[*]{0,1}.+[*]{0,1}$", options: RegexOptions.Compiled)]
+        private static partial Regex LikeRegex();
 
         #endregion
 
