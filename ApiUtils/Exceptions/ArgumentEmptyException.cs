@@ -1,6 +1,7 @@
 ﻿using ApiUtils.Extensions;
 using Cysharp.Text;
 using System.Collections;
+using System.Data;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
@@ -35,13 +36,16 @@ namespace ApiUtils.Exceptions
             if (argument is string s && s.IsNullEmptyOrBlank())
                 Throw(paramName: paramName);
 
-            if (argument is ICollection col && col.IsEmpty())
+            if (argument is ICollection col && col.IsNullOrEmpty())
                 Throw(paramName: paramName);
 
-            if (argument is IEnumerable e && e.IsEmpty())
+            if (argument is IEnumerable e && e.IsNullOrEmpty())
                 Throw(paramName: paramName);
 
-            if(EqualityComparer<object>.Default.Equals(x: argument, y: default))
+            if(argument is DataTable d && d.IsNullOrEmpty())
+                Throw(paramName: paramName);
+
+            if (EqualityComparer<object>.Default.Equals(x: argument, y: default))
                 Throw(paramName: paramName);
         }
 

@@ -1,7 +1,6 @@
 ﻿using ApiUtils.Exceptions;
 using Cysharp.Text;
 using System.Globalization;
-using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -9,24 +8,10 @@ using System.Text.RegularExpressions;
 namespace ApiUtils.Extensions
 {
     /// <summary>
-    /// Primitive data type extensions class
+    /// <see cref="string"/> extensions' functions class
     /// </summary>
-    public static partial class PrimitiveExtensions
+    public static partial class StringExtensions
     {
-        #region Byte Array
-
-        /// <summary>
-        /// Converts any <see cref="byte"/> array to <see cref="string"/> value
-        /// </summary>
-        /// <param name="value">Value to convert to <see cref="string"/></param>
-        /// <returns>New <see cref="byte"/> array from <paramref name="value"/></returns>
-        /// <exception cref="DecoderFallbackException">If <paramref name="value"/> could not be converted to <see cref="string"/> value</exception>
-        public static string ToStringValue(this byte[]? value) => value is null ? string.Empty : Encoding.UTF8.GetString(bytes: value!);
-
-        #endregion
-
-        #region String
-
         /// <summary>
         /// Returns new non nullable <see cref="string"/> value from any nullable <see cref="string"/>
         /// </summary>
@@ -38,7 +23,7 @@ namespace ApiUtils.Extensions
         {
             ArgumentNullException.ThrowIfNull(argument: replacement, paramName: nameof(replacement));
             return value.IsNullEmptyOrBlank() ? replacement : value!;
-        } 
+        }
 
         /// <summary>
         /// Capitalizes nullable <see cref="string"/> value
@@ -55,12 +40,12 @@ namespace ApiUtils.Extensions
         /// <exception cref="TargetInvocationException">If <see cref="SHA512"/> algorithm could not be created well</exception>
         public async static Task<string> HashAsync(this string? value)
         {
-            if (value.IsNullOrEmpty()) 
+            if (value.IsNullOrEmpty())
                 return string.Empty;
 
             string hashString = string.Empty;
 
-            using(SHA512 shaAlgorithm = SHA512.Create())
+            using (SHA512 shaAlgorithm = SHA512.Create())
             {
                 using MemoryStream memoryStream = new(buffer: value.ToByteArray());
                 byte[] hashArray = await shaAlgorithm.ComputeHashAsync(inputStream: memoryStream);
@@ -156,7 +141,7 @@ namespace ApiUtils.Extensions
             IEnumerable<string> keys = groupCollection.Keys;
             using Utf8ValueStringBuilder stringBuilder = new();
 
-            foreach(string key in keys)
+            foreach (string key in keys)
             {
                 switch (key)
                 {
@@ -374,7 +359,7 @@ namespace ApiUtils.Extensions
             string normalize = value!.Normalize(normalizationForm: NormalizationForm.FormD);
             using Utf8ValueStringBuilder builder = new();
 
-            foreach(char c in normalize)
+            foreach (char c in normalize)
             {
                 if (!CharUnicodeInfo.GetUnicodeCategory(ch: c).Equals(obj: UnicodeCategory.NonSpacingMark))
                     builder.Append(value: c);
@@ -388,20 +373,14 @@ namespace ApiUtils.Extensions
 
         }
 
-
-
-        #endregion
-
         #region Generated Regex
 
         [GeneratedRegex(pattern: @"^((?<first>[*]{0,1}))?((?<coincidence>.+))?((?<second>[*]{0,1}))?$", options: RegexOptions.Compiled)]
         private static partial Regex LikeGroupRegex();
 
-
         [GeneratedRegex(pattern: @"^[*]{0,1}.+[*]{0,1}$", options: RegexOptions.Compiled)]
         private static partial Regex LikeRegex();
 
         #endregion
-
     }
 }
