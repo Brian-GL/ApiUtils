@@ -30,7 +30,8 @@ namespace ApiUtils.Extensions
         /// </summary>
         /// <param name="value">Value to capitalize</param>
         /// <returns>New capitalized <see cref="string"/> value. Otherwise <see cref="string.Empty"/> if <paramref name="value"/> is null, empty or full with white spaces</returns>
-        public static string Capitalize(this string? value) => value.IsNullOrEmpty() ? string.Empty : CultureInfo.CurrentCulture.TextInfo.ToTitleCase(str: value!.ToLower());
+        public static string Capitalize(this string? value) 
+            => value.IsNullOrEmpty() ? string.Empty : CultureInfo.CurrentCulture.TextInfo.ToTitleCase(str: value.ToLowercase());
 
         /// <summary>
         /// Hash any <see cref="string"/> value using <see cref="SHA512"/> algorithm
@@ -64,11 +65,11 @@ namespace ApiUtils.Extensions
         /// <exception cref="ArgumentException">If <paramref name="pattern"/> has invalid regex pattern format</exception>
         /// <exception cref="ArgumentNullException">If <paramref name="pattern"/> is null</exception>
         /// <exception cref="ArgumentOutOfRangeException">If <paramref name="pattern"/> has invalid regex pattern format</exception>
-        public static bool IsMatch(this string? value, string pattern)
+        public static bool IsMatch(this string? value, string? pattern)
         {
             ArgumentNullException.ThrowIfNull(argument: pattern, paramName: nameof(pattern));
 
-            Regex regularExpression = new(pattern: pattern, options: RegexOptions.Compiled);
+            Regex regularExpression = new(pattern: pattern!, options: RegexOptions.Compiled);
             return !value.IsNullOrEmpty() && regularExpression.IsMatch(input: value!);
         }
 
@@ -79,10 +80,10 @@ namespace ApiUtils.Extensions
         /// <param name="regularExpression">Regex</param>
         /// <returns><see cref="true"/> if <paramref name="value"/> is match from <paramref name="regularExpression"/>, <see cref="false"/> otherwise</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="pattern"/> is null</exception>
-        public static bool IsMatch(this string? value, Regex regularExpression)
+        public static bool IsMatch(this string? value, Regex? regularExpression)
         {
             ArgumentNullException.ThrowIfNull(argument: regularExpression, paramName: nameof(regularExpression));
-            return !value.IsNullOrEmpty() && regularExpression.IsMatch(input: value!);
+            return !value.IsNullOrEmpty() && regularExpression!.IsMatch(input: value!);
         }
 
         /// <summary>
@@ -121,13 +122,13 @@ namespace ApiUtils.Extensions
         /// Defines a SQL <a href="https://www.w3schools.com/sql/sql_like.asp">like</a> function to search for a specified <paramref name="pattern"/> in <paramref name="value"/>
         /// </summary>
         /// <param name="value">Value to find <paramref name="pattern"/> coincidence inside it</param>
-        /// <param name="pattern">Coincidence to find. To find you can use the character '*' to specify any caracter previous or next from the coincidence to find</param>
+        /// <param name="pattern">Coincidence to find. To find you can use the character '%' to specify any caracter previous or next from the coincidence to find</param>
         /// <returns><see cref="true"/> if <paramref name="pattern"/> coincidence is found in <paramref name="value"/>. <see cref="false"/> otherwise</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="pattern"/> is null</exception>
         /// <exception cref="ArgumentFormatException">If <paramref name="pattern"/> has an invalid format value</exception>
         /// <exception cref="ArgumentException">If <paramref name="pattern"/> could not be used for like operation</exception>
         /// <exception cref="RegexMatchTimeoutException">If <paramref name="pattern"/> could not be used for match operation</exception>
-        public static bool Like(this string? value, string pattern)
+        public static bool Like(this string? value, string? pattern)
         {
             ArgumentNullException.ThrowIfNull(argument: pattern, paramName: nameof(pattern));
             ArgumentFormatException.ThrowIfInvalid(argument: pattern, regularExpression: LikeRegex());
@@ -137,7 +138,7 @@ namespace ApiUtils.Extensions
 
             // Generate the new regex expression to make like function.
 
-            GroupCollection groupCollection = LikeGroupRegex().Match(input: pattern).Groups;
+            GroupCollection groupCollection = LikeGroupRegex().Match(input: pattern!).Groups;
             IEnumerable<string> keys = groupCollection.Keys;
             using Utf8ValueStringBuilder stringBuilder = new();
 
@@ -199,11 +200,11 @@ namespace ApiUtils.Extensions
         /// <param name="value">Value to convert to <see cref="DateTime"/> value</param>
         /// <param name="dateTimeFormat">Datetime format. Example:  dd/MM/yyyy HH:mm:ss</param>
         /// <returns>New <see cref="DateTime"/> value from <see cref="string"/> <paramref name="value"/> if it has a valid date time format. <see cref="DateTime.MinValue"/> otherwise</returns>
-        /// <exception cref="ArgumentNullException">If <paramref name="dateTimeFormat"/> is null</exception>
+        /// <exception cref="ArgumentEmptyException">If <paramref name="dateTimeFormat"/> is null or empty</exception>
         /// <exception cref="ArgumentException">If <paramref name="dateTimeFormat"/> has invalid format</exception>
         public static DateTime ToDateTime(this string? value, string dateTimeFormat = "dd/MM/yyyy HH:mm:ss")
         {
-            ArgumentNullException.ThrowIfNull(argument: dateTimeFormat, paramName: nameof(dateTimeFormat));
+            ArgumentEmptyException.ThrowIfEmpty(argument: dateTimeFormat, paramName: nameof(dateTimeFormat));
 
             if (value.IsNullEmptyOrBlank())
                 return DateTime.MinValue;
@@ -351,24 +352,26 @@ namespace ApiUtils.Extensions
         /// </summary>
         /// <param name="value">Value to remove all diacritics</param>
         /// <returns>New <see cref="string"/> value without diacritics from <paramref name="value"/></returns>
+        /// <exception cref="ArgumentException">if <see cref="value"/> could not be able to be normalized</exception>
         public static string WithoutDiacritics(this string? value)
         {
             if (value.IsNullOrEmpty())
                 return string.Empty;
 
+            // Normalize string
             string normalize = value!.Normalize(normalizationForm: NormalizationForm.FormD);
-            using Utf8ValueStringBuilder builder = new();
 
+            // Get char without diacriticts and concat using string builder
+            using Utf8ValueStringBuilder builder = new();
             foreach (char c in normalize)
             {
                 if (!CharUnicodeInfo.GetUnicodeCategory(ch: c).Equals(obj: UnicodeCategory.NonSpacingMark))
                     builder.Append(value: c);
             }
 
+            // Re-normaliz string
             string builderResult = builder.ToString();
-
             normalize = builderResult.Normalize(normalizationForm: NormalizationForm.FormC);
-
             return normalize;
 
         }
@@ -378,7 +381,7 @@ namespace ApiUtils.Extensions
         [GeneratedRegex(pattern: @"^((?<first>[*]{0,1}))?((?<coincidence>.+))?((?<second>[*]{0,1}))?$", options: RegexOptions.Compiled)]
         private static partial Regex LikeGroupRegex();
 
-        [GeneratedRegex(pattern: @"^[*]{0,1}.+[*]{0,1}$", options: RegexOptions.Compiled)]
+        [GeneratedRegex(pattern: @"^[%]{0,1}.+[%]{0,1}$", options: RegexOptions.Compiled)]
         private static partial Regex LikeRegex();
 
         #endregion

@@ -9,7 +9,7 @@ namespace ApiUtils.Extensions
     public static class DataTableExtensions
     {
         /// <summary>
-        /// Exports excel data file from <paramref name="dataTable"/> data source
+        /// Exports basic excel file from <see cref="DataTable"/> <paramref name="value"/> data source
         /// </summary>
         /// <param name="value">Data source</param>
         /// <returns>Excel <see cref="byte"/> array data</returns>

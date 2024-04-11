@@ -36,9 +36,6 @@ namespace ApiUtils.Exceptions
             if (argument is string s && s.IsNullEmptyOrBlank())
                 Throw(paramName: paramName);
 
-            if (argument is ICollection col && col.IsNullOrEmpty())
-                Throw(paramName: paramName);
-
             if (argument is IEnumerable e && e.IsNullOrEmpty())
                 Throw(paramName: paramName);
 

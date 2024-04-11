@@ -12,13 +12,10 @@
         /// <typeparam name="T"><paramref name="value"/> data type</typeparam>
         /// <param name="value">Value to find in <paramref name="values"/></param>
         /// <param name="values">Seach values</param>
-        /// <returns><see cref="true"/> if <paramref name="value"/> is equal to any value in <paramref name="values"/></returns>
-        /// <exception cref="ArgumentNullException">If <paramref name="values"/> is null, considering <paramref name="value"/> is not null. Otherwise <see cref="false"/></exception>
-        public static bool In<T>(this T? value, params T?[] values)
+        /// <returns><see cref="true"/> if <paramref name="value"/> is equal to any value in <paramref name="values"/>. <see cref="false"/> otherwise</returns>
+        public static bool In<T>(this T? value, params T?[]? values)
         {
-            ArgumentNullException.ThrowIfNull(argument: values, paramName: nameof(values));
-
-            if (value is not null)
+            if (value is not null && values is not null)
             {
                 foreach (T? val in values)
                 {
@@ -28,8 +25,14 @@
             }
 
             return false;
-
         }
 
+        /// <summary>
+        /// Defines if any array of <typeparamref name="T"/> if null or empty
+        /// </summary>
+        /// <typeparam name="T">Array data type</typeparam>
+        /// <param name="value">Array to validate if is null or empty</param>
+        /// <returns><see cref="true"/> if <paramref name="value"/> is null or empty. <see cref="false"/> otherwise</returns>
+        public static bool IsNullOrEmpty<T>(this T?[]? value) => value is null || value?.Length < 1;
     }
 }
