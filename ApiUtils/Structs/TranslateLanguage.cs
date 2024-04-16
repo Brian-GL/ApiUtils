@@ -3,7 +3,7 @@
     /// <summary>
     /// Available languages to use for translations purposes
     /// </summary>
-    public struct TextTranslationLanguage
+    public struct TranslateLanguage
     {
         public const string Afrikaans = "af";
         public const string Akan = "ak";

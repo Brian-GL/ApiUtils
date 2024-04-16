@@ -41,7 +41,6 @@ This project uses the follow NuGET packages, thanks for the use:
 
 * [**ClosedXML**](https://github.com/ClosedXML/ClosedXML)
 * [**FluentValidation**](https://docs.fluentvalidation.net/)
-* [**FreeSpire.PDF**](https://github.com/SpirePDF/FreeSpire.PDF?tab=readme-ov-file)
 * [**GTranslate**](https://github.com/d4n3436/GTranslate)
 * [**log4net**](https://logging.apache.org/log4net/)
 * [**MongoDB.Driver**](https://www.mongodb.com/docs/drivers/csharp/current/)
